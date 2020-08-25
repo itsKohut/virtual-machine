@@ -10,7 +10,17 @@ import lombok.extern.slf4j.Slf4j;
 public class STOP extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE = null;
+        this.REGISTER_TWO = null;
+        this.PARAMETER = null;
+
+        return this;
+    }
+
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) {
 
         log.info("PROGRAM FINISHED");
         log.info("PC moved to initial memory position");

@@ -11,17 +11,28 @@ import lombok.extern.slf4j.Slf4j;
 public class ADDI extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] parameters) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE = parameters[1];
+        this.REGISTER_TWO = null;
+        this.PARAMETER = parameters[2];
 
-        int rd = Parser.parseParamater(parameters[1]);
-        int k = Parser.parseParamater(parameters[2]);
+        return this;
+    }
+
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) {
+
+        int rd = Parser.parseParamater(REGISTER_ONE);
+        int k = Parser.parseParamater(PARAMETER);
 
         int registerValue = cpu.getValueFromRegister(rd);
         int result = registerValue + k;
 
-        log.info("Registrador {} = {}", rd, result);
+        log.info("Registrador {} = {}", rd + 1, result);
         cpu.updateRegister(rd, result);
         cpu.incrementPC();
 
     }
+
 }

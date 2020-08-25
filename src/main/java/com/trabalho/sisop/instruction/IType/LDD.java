@@ -11,16 +11,36 @@ import lombok.extern.slf4j.Slf4j;
 public class LDD extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE = parameters[1];
+        this.REGISTER_TWO = null;
+        this.PARAMETER = parameters[2];
 
-        int rd = Parser.parseParamater(operation[1]);
-        int A = Parser.parseParamater(operation[2]);
+        return this;
+    }
+
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) throws Exception {
+
+        int rd = Parser.parseParamater(REGISTER_ONE);
+        int A = Parser.parseParamater(PARAMETER);
 
         int result = memory.getValueFromIndex(A);
 
-        log.info("Registrador {} = {}", rd, result);
+        valid(memorySector, A);
+
+        log.info("Registrador {} = {}", rd + 1, result);
         cpu.updateRegister(rd, result);
         cpu.incrementPC();
 
+    }
+
+    private void valid(MemorySector memorySector, int willBeLoadedFromPos) throws Exception {
+        int initial = memorySector.getMemoryOffset().getInitial();
+        int limit = memorySector.getMemoryOffset().getLimit();
+
+        if (willBeLoadedFromPos < initial || willBeLoadedFromPos > limit) {
+            throw new Exception("Tentativa de carregar uma posição de memória inválida");        }
     }
 }

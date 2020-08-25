@@ -10,19 +10,11 @@ public class App {
     public static final int MEMORY_SIZE = 1024;
     public static final int QUANTITY_OF_MEMORY_SECTORS = 1;
 
-    // TODO criar registrado de instrução, no método run da cpu deve criar o objeto da instrução em ve de executalo direto
-    
-    // TODO ao criar o objeto instrução.build(parameters) e na classe adicionar os 4 parametros (alguns devem ficar nulos mesmo,
-    //  depende da instrução) terá alidação nisso também, ex: [OPCODE, REG, REG, PAR]
 
-    // TODO criar as validações possiveis em cada instrução, jogar exceção de um instrução ou mudar a variavel global quando
-    //  lançar para STOP, para que seja terminado o programa
+    // TODO Criar no MemoryOffset partição de instruções (o que é lido do arquivo de textp) e dados (inteiros escritos na memória);
 
-    // TODO criar os programas na linguagem de 'assemble', P2, P3 e P4 (ver enunciado do trabalho)
-
-    // TODO Validar escrita e leitura da dados na memória (inicialmente so vamos ter uma bloco de memoria)
-    //   - daria para adicionar essa logica nas instruções no que diz respeito as validações necessárias a serem feitas
-    //   caso tente escrever onde as instruções (ex: LDI, STX ... etc) estão deve ocorrer erro. (Espaço de dados e de instruções)
+    // TODO depois de criado o item acima, ajustar as validações das intruções de acesso de memória: leitura (LDD, LDX) e escrita (STD, STX)
+    // Hoje valida apenas se alguma dessa instrução fizer um acesso fora de seu setor.
 
     // TODO programa apenas executa um programa independente do quantos programas estiverem na fila do storage - criar loop
 
@@ -37,7 +29,6 @@ public class App {
         virtualMachine.run();
 
         virtualMachine.getMemory().printAllMemoryStack();
-
 
     }
 }

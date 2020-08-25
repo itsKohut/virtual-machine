@@ -20,6 +20,7 @@ public class CPU {
 
     private int pc = 0;
     private Integer[] registers;
+    private Instruction registerInstruction;
 
     public CPU() {
         this.registers = new Integer[QUANTITY_OF_REGISTERS];
@@ -52,7 +53,20 @@ public class CPU {
 
             log.info(instruction);
 
-            Instruction.instructions.get(OPCODE).execute(this, memory, memorySector, parameters);
+            registerInstruction = Instruction.instructions.get(OPCODE).construct(parameters);
+
+            try {
+                registerInstruction.execute(this, memory, memorySector);
+
+            } catch (Exception e) {
+
+                //TODO Limpar memória em caso de erro
+
+                OPCODE = STOP;
+                log.info(e.getMessage());
+                log.info("PROGRAM FINISHED DUE INTERRUPTION");
+
+            }
         }
     }
 }

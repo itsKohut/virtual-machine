@@ -14,8 +14,8 @@ public class Parser {
             return (Character.getNumericValue(instruction.charAt(1)) - ARRAY_OUTBOUND_FIX);
         }
 
-        if(isDirectMemoryAcess(instruction)) {
-            return Integer.parseInt(instruction.substring(1,3));
+        if (isDirectMemoryAcess(instruction)) {
+            return Integer.parseInt(instruction.substring(1, instruction.length() - 1));
         }
 
         return Integer.parseInt(instruction);

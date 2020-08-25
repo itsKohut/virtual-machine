@@ -11,17 +11,27 @@ import lombok.extern.slf4j.Slf4j;
 public class ADD extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE = parameters[1];
+        this.REGISTER_TWO = parameters[2];
+        this.PARAMETER = null;
 
-        int rd = Parser.parseParamater(operation[1]);
-        int rs = Parser.parseParamater(operation[2]);
+        return this;
+    }
+
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) {
+
+        int rd = Parser.parseParamater(REGISTER_ONE);
+        int rs = Parser.parseParamater(REGISTER_TWO);
 
         int rdValue = cpu.getRegisters()[rd];
         int rsValue = cpu.getRegisters()[rs];
 
         int result = rdValue + rsValue;
 
-        log.info("Registrador {} = {}", rd, result);
+        log.info("Registrador {} = {}", rd + 1, result);
         cpu.updateRegister(rd, result);
         cpu.incrementPC();
 
