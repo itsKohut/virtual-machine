@@ -38,14 +38,14 @@ public class VirtualMachine {
 
         String[] x = memory.getAdresses();
 
-        for (int i = 0; i < x.length; i++) {   //popula a memoria com valores para testar o program 2 3 4;
-            x[i] = String.valueOf(x.length - i);
-        }
+/** Como a memoria é de strings, a memoria começa vazia, apenas o program 1 popula os campos no qual vai usar,
+ *  para testar os demais programas é necessário descomentar as linhas abaixo */
+//        for (int i = 0; i < x.length; i++) {
+//            x[i] = String.valueOf(x.length - i);
+//        }
 
         MemorySector memorySector = this.memory.getMemorySectorFree();
         List<String> program = this.storage.getProgramWaitingProcessingQueue();
-
-        //TODO criar loop para execução de todos os programas
 
         if (isFalse(isNull(memorySector)) && isNotEmpty(program)) {
             memory.loadProgramToMemorySector(memorySector, program);

@@ -42,7 +42,7 @@ public class CPU {
         return this.getRegisters()[register];
     }
 
-    public void execute(Memory memory, MemorySector memorySector) { //sem validacao e o campo de memoria
+    public void execute(Memory memory, MemorySector memorySector) {
         String OPCODE = "";
 
         while (isFalse(OPCODE.equals(STOP))) {
@@ -60,7 +60,7 @@ public class CPU {
 
             } catch (Exception e) {
 
-                //TODO Limpar memória em caso de erro
+                //TODO será necessário criar um dump de memoria para a segunda estapa do trabalho quando ocorrer um erro.
 
                 OPCODE = STOP;
                 log.info(e.getMessage());

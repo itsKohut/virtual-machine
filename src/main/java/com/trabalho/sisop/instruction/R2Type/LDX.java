@@ -26,11 +26,10 @@ public class LDX extends Instruction {
         int rd = Parser.parseParamater(REGISTER_ONE);
         int rs = Parser.parseParamater(REGISTER_TWO);
 
-        int rsValue = cpu.getValueFromRegister(rs);
-        int result = memory.getValueFromIndex(rsValue);
-
         valid(memorySector, rs);
 
+        int rsValue = cpu.getValueFromRegister(rs);
+        int result = memory.getValueFromIndex(rsValue);
 
         log.info("Registrador {} = {}", rd + 1, result);
         cpu.updateRegister(rd, result);

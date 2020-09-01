@@ -26,9 +26,9 @@ public class LDD extends Instruction {
         int rd = Parser.parseParamater(REGISTER_ONE);
         int A = Parser.parseParamater(PARAMETER);
 
-        int result = memory.getValueFromIndex(A);
-
         valid(memorySector, A);
+
+        int result = memory.getValueFromIndex(A);
 
         log.info("Registrador {} = {}", rd + 1, result);
         cpu.updateRegister(rd, result);

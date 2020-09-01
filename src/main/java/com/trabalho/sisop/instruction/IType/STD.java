@@ -26,9 +26,9 @@ public class STD extends Instruction {
         int A = Parser.parseParamater(PARAMETER);
         int rs = Parser.parseParamater(REGISTER_ONE);
 
-        int rsValue = cpu.getValueFromRegister(rs);
-
         valid(memorySector, A);
+
+        int rsValue = cpu.getValueFromRegister(rs);
 
         log.info("Memoria [{}] = {}", A, rsValue);
         memory.writeValueToMemory(A, rsValue);
