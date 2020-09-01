@@ -11,9 +11,19 @@ import lombok.extern.slf4j.Slf4j;
 public class JMP extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE = null;
+        this.REGISTER_TWO = null;
+        this.PARAMETER = parameters[1];
 
-        int k = Parser.parseParamater(operation[1]);
+        return this;
+    }
+
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) {
+
+        int k = Parser.parseParamater(PARAMETER);
 
         log.info("PC Jump to {}", k);
         cpu.updatePC(k);

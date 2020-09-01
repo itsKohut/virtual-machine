@@ -10,21 +10,15 @@ public class App {
     public static final int MEMORY_SIZE = 1024;
     public static final int QUANTITY_OF_MEMORY_SECTORS = 1;
 
-    // TODO criar registrado de instrução, no método run da cpu deve criar o objeto da instrução em ve de executalo direto
-    
-    // TODO ao criar o objeto instrução.build(parameters) e na classe adicionar os 4 parametros (alguns devem ficar nulos mesmo,
-    //  depende da instrução) terá alidação nisso também, ex: [OPCODE, REG, REG, PAR]
 
-    // TODO criar as validações possiveis em cada instrução, jogar exceção de um instrução ou mudar a variavel global quando
-    //  lançar para STOP, para que seja terminado o programa
+    // TODO Para a segunda parte do trabalho será necessário criar no MemoryOffset uma subdivisão de instruções
+    //  (o que é lido do arquivo de texto) e dados (inteiros escritos na memória);
 
-    // TODO criar os programas na linguagem de 'assemble', P2, P3 e P4 (ver enunciado do trabalho)
+    // TODO depois de criada a lógica acima, será necessário validar as operações leitura (LDD, LDX) e escrita (STD, STX)
+    // hoje valida apenas se alguma dessa instrução fizer um acesso fora de seu setor e não se ela esta escrevendo num area da memoria indevida.
+    // como a memoria hoje conta com apenas 1 setor, e os valores no inicio do programa são setados para iniciar em uma determinada posição [50]
+    // inicialmente não haverá casos onde possa ocorrer um subscrita das instruções por valores de dados.
 
-    // TODO Validar escrita e leitura da dados na memória (inicialmente so vamos ter uma bloco de memoria)
-    //   - daria para adicionar essa logica nas instruções no que diz respeito as validações necessárias a serem feitas
-    //   caso tente escrever onde as instruções (ex: LDI, STX ... etc) estão deve ocorrer erro. (Espaço de dados e de instruções)
-
-    // TODO programa apenas executa um programa independente do quantos programas estiverem na fila do storage - criar loop
 
     public static void main(String[] args) {
 
@@ -37,7 +31,6 @@ public class App {
         virtualMachine.run();
 
         virtualMachine.getMemory().printAllMemoryStack();
-
 
     }
 }

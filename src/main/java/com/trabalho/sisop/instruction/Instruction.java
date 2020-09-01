@@ -8,6 +8,7 @@ import com.trabalho.sisop.instruction.R1Type.SWAP;
 import com.trabalho.sisop.instruction.R2Type.*;
 import com.trabalho.sisop.memory.Memory;
 import com.trabalho.sisop.memory.MemorySector;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
@@ -15,9 +16,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
+@Data
 public abstract class Instruction {
 
     public static final Map<String, Instruction> instructions;
+
+    protected String OPCODE;
+    protected String REGISTER_ONE;
+    protected String REGISTER_TWO;
+    protected String PARAMETER;
 
     static {
         Map<String, Instruction> instrucionsClasses = new HashMap<>();
@@ -45,6 +52,8 @@ public abstract class Instruction {
         log.info("Initiliazed instruction map class");
     }
 
-    public abstract void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation);
+    public abstract Instruction construct(String[] parameters);
+
+    public abstract void execute(CPU cpu, Memory memory, MemorySector memorySector) throws Exception;
 
 }

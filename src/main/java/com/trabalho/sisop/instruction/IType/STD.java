@@ -11,10 +11,22 @@ import lombok.extern.slf4j.Slf4j;
 public class STD extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE = parameters[2];
+        this.REGISTER_TWO = null;
+        this.PARAMETER = parameters[1];
 
-        int A = Parser.parseParamater(operation[1]);
-        int rs = Parser.parseParamater(operation[2]);
+        return this;
+    }
+
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) throws Exception {
+
+        int A = Parser.parseParamater(PARAMETER);
+        int rs = Parser.parseParamater(REGISTER_ONE);
+
+        valid(memorySector, A);
 
         int rsValue = cpu.getValueFromRegister(rs);
 
@@ -23,5 +35,14 @@ public class STD extends Instruction {
 
         cpu.incrementPC();
 
+    }
+
+    private void valid(MemorySector memorySector, int willBeSavedAtPos) throws Exception {
+        int initial = memorySector.getMemoryOffset().getInitial();
+        int limit = memorySector.getMemoryOffset().getLimit();
+
+        if (willBeSavedAtPos < initial || willBeSavedAtPos > limit) {
+            throw new Exception("Tentativa de salvar em uma posição de memória inválida");
+        }
     }
 }

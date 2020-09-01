@@ -11,16 +11,37 @@ import lombok.extern.slf4j.Slf4j;
 public class LDX extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE = parameters[1];
+        this.REGISTER_TWO = parameters[2];
+        this.PARAMETER = null;
 
-        int rd = Parser.parseParamater(operation[1]);
-        int rs = Parser.parseParamater(operation[2]);
+        return this;
+    }
 
-        int rsValue = memory.getValueFromIndex(rs);
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) throws Exception {
 
-        log.info("Registrador {} = {}", rd, rsValue);
-        cpu.updateRegister(rd, rsValue);
+        int rd = Parser.parseParamater(REGISTER_ONE);
+        int rs = Parser.parseParamater(REGISTER_TWO);
+
+        valid(memorySector, rs);
+
+        int rsValue = cpu.getValueFromRegister(rs);
+        int result = memory.getValueFromIndex(rsValue);
+
+        log.info("Registrador {} = {}", rd + 1, result);
+        cpu.updateRegister(rd, result);
         cpu.incrementPC();
 
+    }
+
+    private void valid(MemorySector memorySector, int willBeLoadedFromPos) throws Exception {
+        int initial = memorySector.getMemoryOffset().getInitial();
+        int limit = memorySector.getMemoryOffset().getLimit();
+
+        if (willBeLoadedFromPos < initial || willBeLoadedFromPos > limit) {
+            throw new Exception("Tentativa de carregar uma posição de memória inválida");        }
     }
 }

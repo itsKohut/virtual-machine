@@ -11,10 +11,20 @@ import lombok.extern.slf4j.Slf4j;
 public class JMPIL extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE =  parameters[1];
+        this.REGISTER_TWO = parameters[2];
+        this.PARAMETER = null;
 
-        int rs = Parser.parseParamater(operation[1]);
-        int rc = Parser.parseParamater(operation[2]);
+        return this;
+    }
+
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) {
+
+        int rs = Parser.parseParamater(REGISTER_ONE);
+        int rc = Parser.parseParamater(REGISTER_TWO);
 
         int rsValue = cpu.getRegisters()[rs];
         int rcValue = cpu.getRegisters()[rc];

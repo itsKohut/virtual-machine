@@ -11,9 +11,19 @@ import lombok.extern.slf4j.Slf4j;
 public class JMPI extends Instruction {
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector, String[] operation) {
+    public Instruction construct(String[] parameters) {
+        this.OPCODE = parameters[0];
+        this.REGISTER_ONE =  parameters[1];
+        this.REGISTER_TWO = null;
+        this.PARAMETER = null;
 
-        int rs = Parser.parseParamater(operation[1]);
+        return this;
+    }
+
+    @Override
+    public void execute(CPU cpu, Memory memory, MemorySector memorySector) {
+
+        int rs = Parser.parseParamater(REGISTER_ONE);
 
         int rsValue = cpu.getRegisters()[rs];
 

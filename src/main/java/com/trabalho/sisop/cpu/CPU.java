@@ -20,6 +20,7 @@ public class CPU {
 
     private int pc = 0;
     private Integer[] registers;
+    private Instruction registerInstruction;
 
     public CPU() {
         this.registers = new Integer[QUANTITY_OF_REGISTERS];
@@ -41,7 +42,7 @@ public class CPU {
         return this.getRegisters()[register];
     }
 
-    public void execute(Memory memory, MemorySector memorySector) { //sem validacao e o campo de memoria
+    public void execute(Memory memory, MemorySector memorySector) {
         String OPCODE = "";
 
         while (isFalse(OPCODE.equals(STOP))) {
@@ -52,7 +53,20 @@ public class CPU {
 
             log.info(instruction);
 
-            Instruction.instructions.get(OPCODE).execute(this, memory, memorySector, parameters);
+            registerInstruction = Instruction.instructions.get(OPCODE).construct(parameters);
+
+            try {
+                registerInstruction.execute(this, memory, memorySector);
+
+            } catch (Exception e) {
+
+                //TODO será necessário criar um dump de memoria para a segunda estapa do trabalho quando ocorrer um erro.
+
+                OPCODE = STOP;
+                log.info(e.getMessage());
+                log.info("PROGRAM FINISHED DUE INTERRUPTION");
+
+            }
         }
     }
 }
