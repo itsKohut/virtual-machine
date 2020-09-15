@@ -10,10 +10,14 @@ import java.util.Queue;
 @Slf4j
 public class Storage {
 
-    Queue<List<String>> programs;;
+    Queue<List<String>> programs;
 
-    public List<String> getProgramWaitingProcessingQueue() {
+    public List<String> getWaitingProgramInProcessingQueue() {
         log.info("Program removed from storage and added to memory for processing");
         return programs.remove();
+    }
+
+    public int getSizeProcessingQueue() {
+        return programs.size();
     }
 }

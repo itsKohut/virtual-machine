@@ -4,11 +4,11 @@ public class Parser {
 
     public final static int ARRAY_OUTBOUND_FIX = 1;
 
-    public static String[] parseOperation(final String instructions) {
+    public static String[] parseOperation(String instructions) {
         return instructions.split("[ ,]+");
     }
 
-    public static int parseParamater(final String instruction) {
+    public static int parseParamater(String instruction) {
 
         if (isRegister(instruction)) {
             return (Character.getNumericValue(instruction.charAt(1)) - ARRAY_OUTBOUND_FIX);

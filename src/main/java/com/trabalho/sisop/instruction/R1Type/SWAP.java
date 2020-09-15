@@ -2,8 +2,8 @@ package com.trabalho.sisop.instruction.R1Type;
 
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.instruction.Instruction;
-import com.trabalho.sisop.memory.Memory;
-import com.trabalho.sisop.memory.MemorySector;
+import com.trabalho.sisop.memory.MemoryManager;
+import com.trabalho.sisop.memory.MemoryFrame;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -20,7 +20,7 @@ public class SWAP extends Instruction {
     }
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector) {
+    public void execute(int programID, CPU cpu, MemoryManager memoryManager) {
 
         int register_0 = 0;
         int register_1 = 1;

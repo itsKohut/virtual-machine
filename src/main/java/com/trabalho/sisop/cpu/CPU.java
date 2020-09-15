@@ -1,8 +1,8 @@
 package com.trabalho.sisop.cpu;
 
+import com.trabalho.sisop.ProgramManager;
 import com.trabalho.sisop.instruction.Instruction;
-import com.trabalho.sisop.memory.Memory;
-import com.trabalho.sisop.memory.MemorySector;
+import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.utils.Parser;
 import lombok.Getter;
 import lombok.ToString;
@@ -42,31 +42,50 @@ public class CPU {
         return this.getRegisters()[register];
     }
 
-    public void execute(Memory memory, MemorySector memorySector) {
+    public void execute(int programID, MemoryManager memoryManager) {
+
+        log.info("PROGRAM WITH ID: {} RUNNING", programID);
+
+        this.pc = 0;
+
         String OPCODE = "";
 
         while (isFalse(OPCODE.equals(STOP))) {
 
-            String instruction = memory.getInstructions(this.pc);
-            String[] parameters = Parser.parseOperation(instruction);
-            OPCODE = parameters[0];
-
-            log.info(instruction);
-
-            registerInstruction = Instruction.instructions.get(OPCODE).construct(parameters);
-
             try {
-                registerInstruction.execute(this, memory, memorySector);
 
-            } catch (Exception e) {
+                int logicalMemoryPosition = memoryManager.logicalMemoryTranslator(programID, this.pc); // Traduz a posição da memória física para a memória lógica
+                String instruction = memoryManager.getInstructions(logicalMemoryPosition); // Carrega a instrução contida na posição da memória lógica (ex: LDI R1, 1)
+                String[] parameters = Parser.parseOperation(instruction); // Faz o split dos parametros da instrução
 
-                //TODO será necessário criar um dump de memoria para a segunda estapa do trabalho quando ocorrer um erro.
+                OPCODE = parameters[0]; // Obtém o OPCODE para chamar o executor correto da instrução
+
+                log.info(instruction);
+
+                registerInstruction = Instruction.instructions.get(OPCODE).construct(parameters); // Constroi a instrução baseado no opcode e seus parametros
+                registerInstruction.execute(programID, this, memoryManager); // Executa a operação
+
+            } catch (Exception e) { // Em caso de erro na execução do programa, o programa irá parar
 
                 OPCODE = STOP;
-                log.info(e.getMessage());
-                log.info("PROGRAM FINISHED DUE INTERRUPTION");
 
+                log.info(e.getMessage());
+                log.info("PROGRAM WITH ID {} FINISHED DUE INTERRUPTION", programID);
             }
         }
+
+        memoryManager.deallocate(programID);
+
+        try { // até achar problema, alguns logs estão sobrepondo o print do dump da memoria
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        log.info(" PROGRAM WITH ID {} FINISHED", programID);
+
+        log.info("Clear page table for program with id {}", programID);
+        ProgramManager.pagTable.remove(programID);
+
     }
 }

@@ -2,8 +2,8 @@ package com.trabalho.sisop.instruction.JType;
 
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.instruction.Instruction;
-import com.trabalho.sisop.memory.Memory;
-import com.trabalho.sisop.memory.MemorySector;
+import com.trabalho.sisop.memory.MemoryFrame;
+import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.utils.Parser;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,7 +13,7 @@ public class JMPIG extends Instruction {
     @Override
     public Instruction construct(String[] parameters) {
         this.OPCODE = parameters[0];
-        this.REGISTER_ONE =  parameters[1];
+        this.REGISTER_ONE = parameters[1];
         this.REGISTER_TWO = parameters[2];
         this.PARAMETER = null;
 
@@ -21,7 +21,7 @@ public class JMPIG extends Instruction {
     }
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector) {
+    public void execute(int programID, CPU cpu, MemoryManager memoryManager) {
 
         int rs = Parser.parseParamater(REGISTER_ONE);
         int rc = Parser.parseParamater(REGISTER_TWO);
@@ -35,6 +35,5 @@ public class JMPIG extends Instruction {
         } else {
             cpu.incrementPC();
         }
-
     }
 }

@@ -6,8 +6,7 @@ import com.trabalho.sisop.instruction.JType.*;
 import com.trabalho.sisop.instruction.R1Type.STOP;
 import com.trabalho.sisop.instruction.R1Type.SWAP;
 import com.trabalho.sisop.instruction.R2Type.*;
-import com.trabalho.sisop.memory.Memory;
-import com.trabalho.sisop.memory.MemorySector;
+import com.trabalho.sisop.memory.MemoryManager;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,6 +53,6 @@ public abstract class Instruction {
 
     public abstract Instruction construct(String[] parameters);
 
-    public abstract void execute(CPU cpu, Memory memory, MemorySector memorySector) throws Exception;
+    public abstract void execute(int programID, CPU cpu, MemoryManager memory) throws Exception;
 
 }

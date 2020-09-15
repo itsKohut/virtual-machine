@@ -2,8 +2,8 @@ package com.trabalho.sisop.instruction.IType;
 
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.instruction.Instruction;
-import com.trabalho.sisop.memory.Memory;
-import com.trabalho.sisop.memory.MemorySector;
+import com.trabalho.sisop.memory.MemoryManager;
+import com.trabalho.sisop.memory.MemoryFrame;
 import com.trabalho.sisop.utils.Parser;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,26 +21,16 @@ public class LDD extends Instruction {
     }
 
     @Override
-    public void execute(CPU cpu, Memory memory, MemorySector memorySector) throws Exception {
+    public void execute(int programID, CPU cpu, MemoryManager memoryManager) throws Exception {
 
         int rd = Parser.parseParamater(REGISTER_ONE);
         int A = Parser.parseParamater(PARAMETER);
 
-        valid(memorySector, A);
-
-        int result = memory.getValueFromIndex(A);
+        int result = memoryManager.getValueFromIndex(programID, A);
 
         log.info("Registrador {} = {}", rd + 1, result);
         cpu.updateRegister(rd, result);
         cpu.incrementPC();
 
-    }
-
-    private void valid(MemorySector memorySector, int willBeLoadedFromPos) throws Exception {
-        int initial = memorySector.getMemoryOffset().getInitial();
-        int limit = memorySector.getMemoryOffset().getLimit();
-
-        if (willBeLoadedFromPos < initial || willBeLoadedFromPos > limit) {
-            throw new Exception("Tentativa de carregar uma posição de memória inválida");        }
     }
 }
