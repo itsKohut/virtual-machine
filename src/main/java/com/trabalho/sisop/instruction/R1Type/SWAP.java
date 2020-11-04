@@ -2,7 +2,6 @@ package com.trabalho.sisop.instruction.R1Type;
 
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.instruction.Instruction;
-import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.memory.MemoryFrame;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,7 +19,7 @@ public class SWAP extends Instruction {
     }
 
     @Override
-    public void execute(int programID, CPU cpu, MemoryManager memoryManager) {
+    public void execute(MemoryFrame[] memoryFrames) {
 
         int register_0 = 0;
         int register_1 = 1;
@@ -32,12 +31,12 @@ public class SWAP extends Instruction {
         int register_7 = 7;
 
         log.info("SWAP");
-        cpu.updateRegister(register_7, cpu.getValueFromRegister(register_3));
-        cpu.updateRegister(register_6, cpu.getValueFromRegister(register_2));
-        cpu.updateRegister(register_5, cpu.getValueFromRegister(register_1));
-        cpu.updateRegister(register_4, cpu.getValueFromRegister(register_0));
+        CPU.updateRegister(register_7, CPU.getValueFromRegister(register_3));
+        CPU.updateRegister(register_6, CPU.getValueFromRegister(register_2));
+        CPU.updateRegister(register_5, CPU.getValueFromRegister(register_1));
+        CPU.updateRegister(register_4, CPU.getValueFromRegister(register_0));
 
-        cpu.incrementPC();
+        CPU.incrementPC();
 
     }
 }

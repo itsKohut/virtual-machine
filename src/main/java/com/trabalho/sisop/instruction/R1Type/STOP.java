@@ -2,7 +2,6 @@ package com.trabalho.sisop.instruction.R1Type;
 
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.instruction.Instruction;
-import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.memory.MemoryFrame;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,11 +19,11 @@ public class STOP extends Instruction {
     }
 
     @Override
-    public void execute(int programID, CPU cpu, MemoryManager memoryManager) {
+    public void execute(MemoryFrame[] memoryFrames) {
 
         log.info("PROGRAM FINISHED");
         log.info("PC moved to initial memory position");
-        cpu.updatePC(0);
+        CPU.updatePC(0);
 
     }
 }

@@ -2,8 +2,8 @@ package com.trabalho.sisop.instruction.IType;
 
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.instruction.Instruction;
-import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.memory.MemoryFrame;
+import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.utils.Parser;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,16 +21,16 @@ public class LDD extends Instruction {
     }
 
     @Override
-    public void execute(int programID, CPU cpu, MemoryManager memoryManager) throws Exception {
+    public void execute(MemoryFrame[] memoryFrames) {
 
         int rd = Parser.parseParamater(REGISTER_ONE);
         int A = Parser.parseParamater(PARAMETER);
 
-        int result = memoryManager.getValueFromIndex(programID, A);
+        int result = MemoryManager.getValueFromIndex(memoryFrames, A);
 
         log.info("Registrador {} = {}", rd + 1, result);
-        cpu.updateRegister(rd, result);
-        cpu.incrementPC();
+        CPU.updateRegister(rd, result);
+        CPU.incrementPC();
 
     }
 }

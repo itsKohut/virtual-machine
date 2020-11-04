@@ -6,14 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static com.trabalho.App.MEMORY_SIZE;
-import static com.trabalho.App.QUANTITY_OF_PAGES;
-import static com.trabalho.sisop.ProgramManager.pagTable;
+import static com.trabalho.App.*;
 import static com.trabalho.sisop.memory.FrameStatus.FREE;
-import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 
 @Slf4j
@@ -21,63 +16,46 @@ import static org.apache.commons.lang3.BooleanUtils.isFalse;
 @Data
 public class MemoryManager {
 
-    private String[] adresses;
-    private MemoryFrame[] memoryFrames;
+    public static String[] ADDRESS = new String[MEMORY_SIZE];
+    public static MemoryFrame[] MEMORY_FRAMES =  structure(MEMORY_SIZE, QUANTITY_OF_FRAMES);
 
-    public MemoryManager(int memorySize, int quantityMemorySectors) {
-
-        this.adresses = new String[memorySize];
-        this.memoryFrames = allocate(memorySize, quantityMemorySectors);
-
-        log.info("Memory has {} size and {} frames", memorySize, this.memoryFrames);
-
+    public static String getInstructions(int position) {
+        return ADDRESS[position];
     }
 
-    public String getInstructions(int position) {
-        return adresses[position];
-    }
+    public static int logicalMemoryTranslator(MemoryFrame[] memoryFrames, int position){
 
-    public int logicalMemoryTranslator(int programID, int position) throws Exception {
+        int logicalPosition = (memoryFrames[position / 16].getFrameID() * 16) + (position % 16);
 
-        MemoryFrame[] memoryFrame = pagTable.get(programID);
-        int logicalPosition = (memoryFrame[position / 16].getFrameID() * 16) + (position % 16);
-
-        validateLogicalMemoryPosition(programID, logicalPosition);
+        if(isFalse(validateLogicalMemoryPosition(memoryFrames, logicalPosition))){
+            return -1;
+        }
 
         return logicalPosition;
     }
 
-    public int getValueFromIndex(int idProgram, int position) throws Exception {
-        return Integer.parseInt(this.getAdresses()[logicalMemoryTranslator(idProgram, position)]);
+    public static int getValueFromIndex(MemoryFrame[] memoryFrames, int position) {
+        return Integer.parseInt(ADDRESS[logicalMemoryTranslator(memoryFrames, position)]);
     }
 
-    public void writeValueToMemory(int idProgram, int position, int value) throws Exception {
-
-        this.getAdresses()[logicalMemoryTranslator(idProgram, position)] = String.valueOf(value);
+    public static void writeValueToMemory(MemoryFrame[] memoryFrames, int position, int value) {
+        ADDRESS[logicalMemoryTranslator(memoryFrames, position)] = String.valueOf(value);
     }
 
-    public void printAllMemoryStack() { // Print toda a memória com valores não nulos
-        List<String> collect = IntStream.range(0, MEMORY_SIZE)
-                .filter(index -> isFalse(isNull(this.getAdresses()[index]))) // remover essa linha para printar todas as posições
-                .mapToObj(index -> "[" + index + "]" + " : " + this.getAdresses()[index])
-                .collect(Collectors.toList());
-        collect.forEach(System.out::println);
-    }
-
-    public MemoryFrame[] getMemoryFreeFrames(int programSize) {
+    public static MemoryFrame[] getMemoryFreeFrames(int programSize) {
 
         int framesNeeded = calculateFramesNeeded(programSize);
 
         log.info("Searching for a set of free frames to run a program that needs {} free frames", framesNeeded);
 
-        return Arrays.stream(memoryFrames)
+        return Arrays.stream(MEMORY_FRAMES)
                 .filter(memoryOffset -> memoryOffset.getStatus().equals(FREE))
                 .filter(memoryOffset -> (memoryOffset.getFrameID() + 1) % 2 == 0)
                 .limit(framesNeeded)
                 .toArray(MemoryFrame[]::new);
     }
 
-    public void loadProgramToMemoryFrames(MemoryFrame[] memoryFrames, List<String> program) { // Carrega o programa para seus respectivos frames
+    public static void allocate(MemoryFrame[] memoryFrames, List<String> program) { // Carrega o programa para seus respectivos frames
 
         log.info("Change status of frames {} to OCCUPIED", memoryFrames);
 
@@ -91,45 +69,39 @@ public class MemoryManager {
                 if (program.size() <= programLineBeingLoaded) {
                     return;
                 }
-                this.adresses[j] = program.get(programLineBeingLoaded++); // atribui a linha do programa lido ao endereço na memória
+              ADDRESS[j] = program.get(programLineBeingLoaded++); // atribui a linha do programa lido ao endereço na memória
             }
         }
     }
 
-    public void deallocate(int programID) { // Dump de memória, desaloca programa, muda os frames do mesmo para livre e printa programa limpando a memória.
+    public static void deallocate(MemoryFrame[] memoryFrames) { // Dump de memória, desaloca programa, muda os frames do mesmo para livre e printa programa limpando a memória.
 
-        log.info("Deallocate memory for program id:  {}", programID);
-        MemoryFrame[] memoryFrames = pagTable.get(programID);
-
-        log.info("Change status of frames {} to FREE", memoryFrames);
         changeStatusFrames(memoryFrames);
 
-        log.info("PRINTING MEMORY STATE OF PROGRAM WITH ID {}", programID);
         final int[] color = {0};
         Arrays.stream(memoryFrames)
                 .forEach(memoryFrame -> {
                     int inicio = memoryFrame.getFrameOffset().getInitial();
                     int fim = memoryFrame.getFrameOffset().getLimit();
                     for (int i = inicio; i <= fim; i++) {
-                        System.out.printf("\n\033[3%dm [%d] : %s", color[0], i, adresses[i]); // Printa o programa e cada cor significa um frame diferente
-                        this.adresses[i] = null;
+                        System.out.printf("\n\033[3%dm [%d] : %s", color[0], i, ADDRESS[i]); // Printa o programa e cada cor significa um frame diferente
+                        ADDRESS[i] = null;
                     }
                     color[0]++;
                     System.out.println();
                 });
     }
 
-    private void validateLogicalMemoryPosition(int programID, int position) throws Exception {
-        MemoryFrame[] memoryFrames = pagTable.get(programID);
+    private static boolean validateLogicalMemoryPosition(MemoryFrame[] memoryFrames, int position) {
         for (int i = 0; i < memoryFrames.length; i++) {
             if (position >= memoryFrames[i].getFrameOffset().getInitial() && position <= memoryFrames[i].getFrameOffset().getLimit()) {
-                return;
+                return true;
             }
         }
-        throw new Exception("Invalid memory acess");
+        return false;
     }
 
-    private MemoryFrame[] allocate(int memorySize, int quantityOfMemoryFrames) { // Ao ser criado a memória faz a divisão de frames e páginas
+    private static MemoryFrame[] structure(int memorySize, int quantityOfMemoryFrames) { // Ao ser criado a memória faz a divisão de frames e páginas
         log.info("Allocate memory of size {} and {} frames", memorySize, quantityOfMemoryFrames);
 
         MemoryFrame[] memoryFramesCreated = new MemoryFrame[quantityOfMemoryFrames];
@@ -140,7 +112,7 @@ public class MemoryManager {
         return memoryFramesCreated;
     }
 
-    private int calculateFramesNeeded(int programSize) { // Calculo para saber quantos frames serão necessários para execução do programa
+    private static int calculateFramesNeeded(int programSize) { // Calculo para saber quantos frames serão necessários para execução do programa
 
         int sizeNeededToRunProgram = programSize * 3; // Programa tem 3x o seu tamanho como espaço de memória necessário para execução
 
@@ -155,9 +127,9 @@ public class MemoryManager {
         return calculus == 0 ? calculus : calculus + 1;
     }
 
-    private void changeStatusFrames(MemoryFrame[] memoryFrames) { // Muda o status do programa quando carregados na memória
+    private static void changeStatusFrames(MemoryFrame[] memoryFrames) { // Muda o status do programa quando carregados na memória
         for (int i = 0; i < memoryFrames.length; i++) {
-            this.memoryFrames[memoryFrames[i].getFrameID()].changeStatus();
+            MEMORY_FRAMES[memoryFrames[i].getFrameID()].changeStatus();
         }
     }
 }

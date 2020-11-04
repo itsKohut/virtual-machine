@@ -2,6 +2,7 @@ package com.trabalho.sisop.instruction.R2Type;
 
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.instruction.Instruction;
+import com.trabalho.sisop.memory.MemoryFrame;
 import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.utils.Parser;
 import lombok.extern.slf4j.Slf4j;
@@ -20,18 +21,18 @@ public class STX extends Instruction {
     }
 
     @Override
-    public void execute(int programID, CPU cpu, MemoryManager memoryManager) throws Exception {
+    public void execute(MemoryFrame[] memoryFrames) {
 
         int rd = Parser.parseParamater(REGISTER_ONE);
         int rs = Parser.parseParamater(REGISTER_TWO);
 
-        int rdValue = cpu.getValueFromRegister(rd);
-        int rsValue = cpu.getValueFromRegister(rs);
+        int rdValue = CPU.getValueFromRegister(rd);
+        int rsValue = CPU.getValueFromRegister(rs);
 
         log.info("Memoria [{}] = {}", rdValue, rsValue);
-        memoryManager.writeValueToMemory(programID, rdValue, rsValue);
+        MemoryManager.writeValueToMemory(memoryFrames, rdValue, rsValue);
 
-        cpu.incrementPC();
+        CPU.incrementPC();
 
     }
 }

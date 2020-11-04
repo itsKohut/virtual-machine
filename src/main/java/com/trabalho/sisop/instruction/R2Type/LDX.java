@@ -21,17 +21,17 @@ public class LDX extends Instruction {
     }
 
     @Override
-    public void execute(int programID, CPU cpu, MemoryManager memoryManager) throws Exception {
+    public void execute(MemoryFrame[] memoryFrames) {
 
         int rd = Parser.parseParamater(REGISTER_ONE);
         int rs = Parser.parseParamater(REGISTER_TWO);
 
-        int rsValue = cpu.getValueFromRegister(rs);
-        int result = memoryManager.getValueFromIndex(programID, rsValue);
+        int rsValue = CPU.getValueFromRegister(rs);
+        int result = MemoryManager.getValueFromIndex(memoryFrames, rsValue);
 
         log.info("Registrador {} = {}", rd + 1, result);
-        cpu.updateRegister(rd, result);
-        cpu.incrementPC();
+        CPU.updateRegister(rd, result);
+        CPU.incrementPC();
 
     }
 }

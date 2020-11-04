@@ -2,7 +2,6 @@ package com.trabalho.sisop.instruction.R2Type;
 
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.instruction.Instruction;
-import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.memory.MemoryFrame;
 import com.trabalho.sisop.utils.Parser;
 import lombok.extern.slf4j.Slf4j;
@@ -21,19 +20,19 @@ public class SUB extends Instruction {
     }
 
     @Override
-    public void execute(int programID, CPU cpu, MemoryManager memoryManager) {
+    public void execute(MemoryFrame[] memoryFrames) {
 
         int rd = Parser.parseParamater(REGISTER_ONE);
         int rs = Parser.parseParamater(REGISTER_TWO);
 
-        int rdValue = cpu.getRegisters()[rd];
-        int rsValue = cpu.getRegisters()[rs];
+        int rdValue = CPU.REGISTERS[rd];
+        int rsValue = CPU.REGISTERS[rs];
 
         int result = rdValue - rsValue;
 
         log.info("Registrador {} = {}", rd + 1, result);
-        cpu.updateRegister(rd, result);
-        cpu.incrementPC();
+        CPU.updateRegister(rd, result);
+        CPU.incrementPC();
 
     }
 }
