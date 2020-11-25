@@ -6,8 +6,11 @@ import com.trabalho.sisop.memory.MemoryFrame;
 import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.utils.Parser;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.Semaphore;
 
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
@@ -15,9 +18,11 @@ import static org.apache.commons.lang3.BooleanUtils.isFalse;
 @Slf4j
 @Getter
 @ToString
-public class CPU {
+public class CPU extends Thread {
 
-    public final static int QUANTITY_OF_REGISTERS = 8;
+    public static Semaphore cpuSemaphore = new Semaphore(1);
+
+    public final static int QUANTITY_OF_REGISTERS = 10;
     private final static String STOP = "STOP";
     public static final int INVALID = -1;
     public static final int CYCLES = 5;
@@ -26,70 +31,84 @@ public class CPU {
     public static Integer[] REGISTERS = new Integer[QUANTITY_OF_REGISTERS];
     public static Instruction REG_INSTRUCTION;
 
-    public static void incrementPC() {
+    public static Integer runningPID = null;
+    public static MemoryFrame[] pidMemoryFrames = null;
+
+    public synchronized static void incrementPC() {
         PC++;
     }
 
-    public static void updatePC(int jumpPosition) {
+    public synchronized static void updatePC(int jumpPosition) {
         PC = jumpPosition;
     }
 
-    public static void updateRegister(int register, int value) {
+    public synchronized static void updateRegister(int register, int value) {
         REGISTERS[register] = value;
     }
 
-    public static int getValueFromRegister(int register) {
+    public synchronized static int getValueFromRegister(int register) {
         return REGISTERS[register];
     }
 
-    public static void setContext(int pc, Integer[] registers, Instruction regInstruction) {
+    public static void setContext(int pc, Integer[] registers, Instruction regInstruction, MemoryFrame[] memoryFrames, Integer pid) {
         PC = pc;
         REGISTERS = registers;
         REG_INSTRUCTION = regInstruction;
+
+        runningPID = pid;
+        pidMemoryFrames = memoryFrames;
     }
 
-    public static void execute(int programID, MemoryFrame[] memoryFrames) {
+    @SneakyThrows
+    public void run() {
+
 
         int clock = 0;
         String OPCODE = "";
 
+        InterruptProcessor ip = new InterruptProcessor();
+
+        cpuSemaphore.acquire();
+
+
         while (isFalse(OPCODE.equals(STOP))) {
 
-            int logicalMemoryPosition = MemoryManager.logicalMemoryTranslator(memoryFrames, PC);
+
+            int logicalMemoryPosition = MemoryManager.logicalMemoryTranslator(pidMemoryFrames, PC);
             String instruction = MemoryManager.getInstructions(logicalMemoryPosition);
             String[] parameters = Parser.parseOperation(instruction);
 
             OPCODE = parameters[0];
 
-            if (checkInterruptions(clock, logicalMemoryPosition, OPCODE) == TRUE) {
+            if (checkInterruptions(ip, clock, logicalMemoryPosition, OPCODE) == TRUE) {
                 break;
             }
 
             REG_INSTRUCTION = Instruction.instructions.get(OPCODE).construct(parameters);
-            REG_INSTRUCTION.execute(memoryFrames);
+            REG_INSTRUCTION.execute(pidMemoryFrames);
 
             clock++;
         }
 
-        InterruptProcessor.handleInterruption(programID);
+        ip.handleInterruption(runningPID);
     }
 
-    public static boolean checkInterruptions(int clock, int logicalMemoryPosition, String OPCODE) {
+    public synchronized static boolean checkInterruptions(InterruptProcessor ip, int clock, int logicalMemoryPosition, String OPCODE) {
 
         boolean flag = false;
 
         if (clock == CYCLES) {
-            InterruptProcessor.setFlag(InterruptProcessor.CLOCK);
+            ip.setFlag(InterruptProcessor.CLOCK);
             flag = true;
         }
 
         if (logicalMemoryPosition == INVALID) {
-            InterruptProcessor.setFlag(InterruptProcessor.HALT);
+            ip.setFlag(InterruptProcessor.HALT);
             flag = true;
         }
 
         if (OPCODE.equals(STOP)) {
-            InterruptProcessor.setFlag(InterruptProcessor.TERMINATE);
+            ip.setFlag(InterruptProcessor.TERMINATE);
             flag = true;
         }
 

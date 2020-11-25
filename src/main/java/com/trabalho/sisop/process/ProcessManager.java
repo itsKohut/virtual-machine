@@ -1,7 +1,7 @@
 package com.trabalho.sisop.process;
 
 import com.trabalho.sisop.Dispatcher;
-import com.trabalho.sisop.ReadyQueue;
+import com.trabalho.sisop.queues.ReadyQueue;
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.memory.MemoryFrame;
 import com.trabalho.sisop.memory.MemoryManager;
@@ -17,7 +17,7 @@ public class ProcessManager {
 
     public static Map<Integer, ProcessControlBlock> PCB_TABLE = new HashMap<>();
 
-    public static void processCreation(List<String> program) {
+    public synchronized static void processCreation(List<String> program) {
 
         MemoryFrame[] freeFrames = MemoryManager.getMemoryFreeFrames(program.size());
 
@@ -27,30 +27,35 @@ public class ProcessManager {
             MemoryManager.allocate(freeFrames, program);
             ReadyQueue.addProcess(pcb);
             pcb.setStatus(StatusPCB.READY);
+
+            processSchedulling();
+
         }
     }
 
-    public static void deallocate(int processID) {
+    public synchronized static void deallocate(int processID) {
         MemoryManager.deallocate(PCB_TABLE.get(processID).getMemoryFrames());
         PCB_TABLE.remove(processID);
     }
 
-    public static void saveContext(int processID) {
+    public synchronized static void saveContext(int processID) {
         ProcessControlBlock pcb = PCB_TABLE.get(processID);
         pcb.setPC(CPU.PC);
         pcb.setRegisterInstruction(CPU.REG_INSTRUCTION);
         pcb.setRegisters(CPU.REGISTERS);
 
-        //Readiciona na fila
         pcb.setStatus(StatusPCB.READY);
         ReadyQueue.addProcess(pcb);
     }
 
-    public static void processSchedulling() {
-        Dispatcher.dispatch();
+    public synchronized static void processSchedulling() {
+
+        Thread th = new Dispatcher();
+        th.start();
+
     }
 
-    private static void attachProcessToPCB(int processID, ProcessControlBlock pcb) {
+    private synchronized static void attachProcessToPCB(int processID, ProcessControlBlock pcb) {
         PCB_TABLE.put(processID, pcb);
     }
 }

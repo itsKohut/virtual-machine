@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static com.trabalho.App.*;
 import static com.trabalho.sisop.memory.FrameStatus.FREE;
@@ -85,10 +86,9 @@ public class MemoryManager {
                     int fim = memoryFrame.getFrameOffset().getLimit();
                     for (int i = inicio; i <= fim; i++) {
                         System.out.printf("\n\033[3%dm [%d] : %s", color[0], i, ADDRESS[i]); // Printa o programa e cada cor significa um frame diferente
-                        ADDRESS[i] = null;
+                        ADDRESS[i] = String.valueOf(new Random().nextInt(10) + 1);
                     }
                     color[0]++;
-                    System.out.println();
                 });
     }
 

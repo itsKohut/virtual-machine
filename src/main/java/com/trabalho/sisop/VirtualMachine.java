@@ -2,12 +2,11 @@ package com.trabalho.sisop;
 
 import com.trabalho.sisop.io.IO;
 import com.trabalho.sisop.memory.MemoryManager;
-import com.trabalho.sisop.process.ProcessManager;
 import com.trabalho.sisop.storage.Storage;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
 import java.util.Random;
 
 @Slf4j
@@ -19,13 +18,12 @@ public class VirtualMachine {
         loadProgramsToCacheStorage();
     }
 
+    @SneakyThrows
     public void run() {
 
-        for (List<String> program : Storage.getPrograms()) {
-            ProcessManager.processCreation(program);
-        }
 
-        ProcessManager.processSchedulling();
+        Thread shellThread = new Shell();
+        shellThread.start();
     }
 
     private void loadProgramsToCacheStorage() {
