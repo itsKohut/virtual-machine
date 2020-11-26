@@ -18,17 +18,17 @@ import static org.apache.commons.lang3.BooleanUtils.isFalse;
 public class MemoryManager {
 
     public static String[] ADDRESS = new String[MEMORY_SIZE];
-    public static MemoryFrame[] MEMORY_FRAMES =  structure(MEMORY_SIZE, QUANTITY_OF_FRAMES);
+    public static MemoryFrame[] MEMORY_FRAMES = structure(MEMORY_SIZE, QUANTITY_OF_FRAMES);
 
     public static String getInstructions(int position) {
         return ADDRESS[position];
     }
 
-    public static int logicalMemoryTranslator(MemoryFrame[] memoryFrames, int position){
+    public static int logicalMemoryTranslator(MemoryFrame[] memoryFrames, int position) {
 
         int logicalPosition = (memoryFrames[position / 16].getFrameID() * 16) + (position % 16);
 
-        if(isFalse(validateLogicalMemoryPosition(memoryFrames, logicalPosition))){
+        if (isFalse(validateLogicalMemoryPosition(memoryFrames, logicalPosition))) {
             return -1;
         }
 
@@ -70,7 +70,7 @@ public class MemoryManager {
                 if (program.size() <= programLineBeingLoaded) {
                     return;
                 }
-              ADDRESS[j] = program.get(programLineBeingLoaded++); // atribui a linha do programa lido ao endereço na memória
+                ADDRESS[j] = program.get(programLineBeingLoaded++); // atribui a linha do programa lido ao endereço na memória
             }
         }
     }
@@ -88,6 +88,7 @@ public class MemoryManager {
                         System.out.printf("\n\033[3%dm [%d] : %s", color[0], i, ADDRESS[i]); // Printa o programa e cada cor significa um frame diferente
                         ADDRESS[i] = String.valueOf(new Random().nextInt(10) + 1);
                     }
+                    System.out.println();
                     color[0]++;
                 });
     }

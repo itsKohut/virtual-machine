@@ -1,4 +1,4 @@
-package com.trabalho.sisop.io;
+package com.trabalho.sisop.loader;
 
 import com.google.common.io.Resources;
 import lombok.SneakyThrows;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Queue;
 
 @Slf4j
-public class IO {
+public class Loader {
 
     public final static String FULL_PATH_FILES_DIR = "src/main/resources/files";
     public final static String RESOURCE_PROGRAM_BASE_PATH = "files/program";

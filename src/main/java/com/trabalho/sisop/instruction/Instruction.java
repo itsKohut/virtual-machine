@@ -5,6 +5,7 @@ import com.trabalho.sisop.instruction.JType.*;
 import com.trabalho.sisop.instruction.R1Type.STOP;
 import com.trabalho.sisop.instruction.R1Type.SWAP;
 import com.trabalho.sisop.instruction.R2Type.*;
+import com.trabalho.sisop.instruction.TRAP.TRAP;
 import com.trabalho.sisop.memory.MemoryFrame;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Collections.*;
 
 @Slf4j
 @Data
@@ -45,7 +48,9 @@ public abstract class Instruction {
         instrucionsClasses.put("STX", new STX());
         instrucionsClasses.put("SWAP", new SWAP());
         instrucionsClasses.put("STOP", new STOP());
-        instructions = Collections.unmodifiableMap(instrucionsClasses);
+        instrucionsClasses.put("TRAP", new TRAP());
+
+        instructions = unmodifiableMap(instrucionsClasses);
 
         log.info("Initiliazed instruction map class");
     }

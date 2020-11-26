@@ -9,7 +9,7 @@ import static com.trabalho.sisop.Dispatcher.dispatchSemaphore;
 
 public class ReadyQueue {
 
-    private static Queue<ProcessControlBlock> readyQueue = new LinkedBlockingQueue<>();
+    public static Queue<ProcessControlBlock> readyQueue = new LinkedBlockingQueue<>();
 
     public synchronized static void addProcess(ProcessControlBlock pcb) {
 

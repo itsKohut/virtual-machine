@@ -20,10 +20,11 @@ import static org.apache.commons.lang3.BooleanUtils.isFalse;
 @ToString
 public class CPU extends Thread {
 
-    public static Semaphore cpuSemaphore = new Semaphore(1);
+    public static Semaphore cpuSemaphore = new Semaphore(0);
 
-    public final static int QUANTITY_OF_REGISTERS = 10;
+    public final static int QUANTITY_OF_REGISTERS = 9;
     private final static String STOP = "STOP";
+    private final static String TRAP = "TRAP";
     public static final int INVALID = -1;
     public static final int CYCLES = 5;
 
@@ -62,40 +63,46 @@ public class CPU extends Thread {
     @SneakyThrows
     public void run() {
 
+        while (true) {
 
-        int clock = 0;
-        String OPCODE = "";
+            int clock = 0;
+            String OPCODE = "";
+            InterruptProcessor ip = new InterruptProcessor();
+            Integer logicalMemoryPosition = null;
 
-        InterruptProcessor ip = new InterruptProcessor();
+            cpuSemaphore.acquire();
 
-        cpuSemaphore.acquire();
+            while (isFalse(OPCODE.equals(STOP))) {
 
+                logicalMemoryPosition = MemoryManager.logicalMemoryTranslator(pidMemoryFrames, PC);
+                String instruction = MemoryManager.getInstructions(logicalMemoryPosition);
+                String[] parameters = Parser.parseOperation(instruction);
 
-        while (isFalse(OPCODE.equals(STOP))) {
+                OPCODE = parameters[0];
 
+                if (checkInterruptions(ip, clock, logicalMemoryPosition, OPCODE) == TRUE) {
+                    break;
+                }
 
-            int logicalMemoryPosition = MemoryManager.logicalMemoryTranslator(pidMemoryFrames, PC);
-            String instruction = MemoryManager.getInstructions(logicalMemoryPosition);
-            String[] parameters = Parser.parseOperation(instruction);
+                REG_INSTRUCTION = Instruction.instructions.get(OPCODE).construct(parameters);
+                REG_INSTRUCTION.execute(pidMemoryFrames);
 
-            OPCODE = parameters[0];
-
-            if (checkInterruptions(ip, clock, logicalMemoryPosition, OPCODE) == TRUE) {
-                break;
+                clock++;
             }
 
-            REG_INSTRUCTION = Instruction.instructions.get(OPCODE).construct(parameters);
-            REG_INSTRUCTION.execute(pidMemoryFrames);
-
-            clock++;
+            ip.handleInterruption(runningPID, logicalMemoryPosition);
         }
-
-        ip.handleInterruption(runningPID);
     }
 
     public synchronized static boolean checkInterruptions(InterruptProcessor ip, int clock, int logicalMemoryPosition, String OPCODE) {
 
         boolean flag = false;
+
+        if (OPCODE.equals(TRAP)) {
+            CPU.incrementPC(); //
+            ip.setFlag(InterruptProcessor.INTERRUPTION_BY_IO);
+            flag = true;
+        }
 
         if (clock == CYCLES) {
             ip.setFlag(InterruptProcessor.CLOCK);
