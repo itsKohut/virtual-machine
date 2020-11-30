@@ -5,6 +5,10 @@ import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.loader.Loader;
 import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.process.ProcessManager;
+import com.trabalho.sisop.queues.BlockedQueue;
+import com.trabalho.sisop.queues.ConsoleOrderQueue;
+import com.trabalho.sisop.queues.FinishedQueue;
+import com.trabalho.sisop.queues.ReadyQueue;
 import com.trabalho.sisop.storage.Storage;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -53,11 +57,10 @@ public class VirtualMachine {
             System.out.println("=======================================");
 
             System.out.println("1 - Shell");
-            System.out.println("2 - Console - IN");
-            System.out.println("3 - Ver fila de prontos");
-            System.out.println("4 - Ver fila de bloqueados");
-            System.out.println("5 - Ver fila de IO");
-            System.out.println("6 - Ver fila de terminados");
+            System.out.println("2 - Ver fila de prontos");
+            System.out.println("3 - Ver fila de bloqueados");
+            System.out.println("4 - Ver fila de IO");
+            System.out.println("5 - Ver fila de terminados");
 
             System.out.println("______________________________________");
 
@@ -84,16 +87,33 @@ public class VirtualMachine {
                     URL url = Resources.getResource(RESOURCE_PROGRAM_BASE_PATH + (program - 1));
                     List<String> programList = Resources.readLines(url, StandardCharsets.UTF_8);
                     ProcessManager.processCreation(programList);
+
+                    if (program == 5) {
+
+                        System.out.println("Write a value to write in memory: ");
+                        console.transferencia  = scanner.nextInt();
+
+                        this.console.consoleSemaphore.release();
+
+                    }
                     break;
 
                 case 2:
+                    ReadyQueue.print();
+                    break;
 
-                    System.out.println("Escrever na memoria");
-                    console.transferencia = scanner.nextInt();
-                    console.consoleSemaphore.release();
+                case 3:
+                    BlockedQueue.print();
+                    break;
+
+                case 4:
+                    ConsoleOrderQueue.print();
+                    break;
+
+                case 5:
+                    FinishedQueue.print();
                     break;
             }
-
         }
     }
 
@@ -101,7 +121,7 @@ public class VirtualMachine {
         Storage.setPrograms(Loader.loadPrograms());
     }
 
-    private void populateMemory() { //Popula memória com valores aleatórios de 1 a 10
+    private void populateMemory() {
         Random random = new Random();
 
         for (int index = 0; index < MemoryManager.ADDRESS.length; index++) {

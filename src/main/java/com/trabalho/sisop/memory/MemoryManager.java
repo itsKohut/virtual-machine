@@ -25,7 +25,6 @@ public class MemoryManager {
     }
 
     public static int logicalMemoryTranslator(MemoryFrame[] memoryFrames, int position) {
-
         int logicalPosition = (memoryFrames[position / 16].getFrameID() * 16) + (position % 16);
 
         if (isFalse(validateLogicalMemoryPosition(memoryFrames, logicalPosition))) {

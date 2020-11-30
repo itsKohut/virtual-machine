@@ -2,16 +2,15 @@ package com.trabalho.sisop;
 
 import com.trabalho.sisop.memory.MemoryManager;
 import com.trabalho.sisop.order.IOTYpe;
+import com.trabalho.sisop.order.Order;
 import com.trabalho.sisop.process.ProcessManager;
 import com.trabalho.sisop.queues.ConsoleOrderQueue;
-import com.trabalho.sisop.order.Order;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Scanner;
 import java.util.concurrent.Semaphore;
-
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 @Slf4j
 @Getter
@@ -25,25 +24,34 @@ public class Console extends Thread {
 
         while (true) {
 
-            if (isNotEmpty(ConsoleOrderQueue.consoleOrderQueue)) {
+            if (ConsoleOrderQueue.getSize() > 0) {
 
                 Order order = ConsoleOrderQueue.removeOrder();// Pega o pedido
 
                 if (order.getIO_OPCODE() == IOTYpe.WRITE) { // Lê valor da memória- DMA (Direct Memory Access)
-                    log.info("Value {} was found at memory position {}", order.getValue(), order.getPositionMemory());
+
+                    log.info("WRITE IO");
+
+
+                    int value = MemoryManager.getValueFromIndex(order.getMemoryFrames(), order.getPositionMemory());
+                    System.out.printf("\nValue %d was found at memory position %d for process with id %d \n", value, order.getPositionMemory(), order.getPID());
+
                 }
 
                 if (order.getIO_OPCODE() == IOTYpe.READ) { // Escreve um valor direto na memória
 
-                    consoleSemaphore.acquire();
+                    this.consoleSemaphore.acquire();
 
-                    System.out.println("Write a value to write in memory: ");
+                    log.info("READ IO");
 
-                    MemoryManager.writeValueToMemory(order.getMemoryFrames(), order.getPositionMemory(), order.getValue());
-                    log.info("The value {} was wrote at memory postion {}", transferencia, order.getPositionMemory());
+
+                    MemoryManager.writeValueToMemory(order.getMemoryFrames(), order.getPositionMemory(), transferencia);
+
+                    System.out.printf("\nThe value %d was wrote at memory position %d", transferencia, order.getPositionMemory());
+
                 }
 
-                ProcessManager.IO_2(order.getPID());
+                ProcessManager.returnIOInterruption(order.getPID());
             }
         }
     }

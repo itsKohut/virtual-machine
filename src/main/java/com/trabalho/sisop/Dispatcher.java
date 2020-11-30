@@ -6,12 +6,14 @@ import com.trabalho.sisop.process.StatusPCB;
 import com.trabalho.sisop.queues.ReadyQueue;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Semaphore;
 
 import static com.trabalho.sisop.cpu.CPU.cpuSemaphore;
 
 @Getter
+@Slf4j
 public class Dispatcher extends Thread {
 
     public Thread thread;
@@ -26,7 +28,10 @@ public class Dispatcher extends Thread {
 
         while (true) {
 
+
             if (ReadyQueue.getSize() > 0) {
+
+                Thread.sleep(300);
 
                 dispatchSemaphore.acquire();
 
@@ -34,8 +39,9 @@ public class Dispatcher extends Thread {
                 programContext.setStatus(StatusPCB.RUNNING);
                 CPU.setContext(programContext.getPC(), programContext.getRegisters(), programContext.getRegisterInstruction(), programContext.getMemoryFrames(), programContext.getPID());
 
-                cpuSemaphore.release();
+                log.info("Scheduling processo with id {}", programContext.getPID());
 
+                cpuSemaphore.release();
             }
         }
     }

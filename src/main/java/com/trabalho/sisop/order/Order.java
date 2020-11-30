@@ -14,12 +14,10 @@ public class Order {
     private MemoryFrame[] memoryFrames;
     private Integer value;
 
-    public Order(Integer PID, IOTYpe IO_OPCODE, Integer positionMemory, MemoryFrame[] memoryFrames, int value) {
+    public Order(Integer PID, IOTYpe IO_OPCODE, Integer positionMemory, MemoryFrame[] memoryFrames) {
         this.PID = PID;
         this.IO_OPCODE = IO_OPCODE;
         this.positionMemory = positionMemory;
         this.memoryFrames = memoryFrames;
-        this.value = value;
     }
-
 }

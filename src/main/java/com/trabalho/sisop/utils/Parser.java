@@ -1,5 +1,7 @@
 package com.trabalho.sisop.utils;
 
+import static java.lang.Character.getNumericValue;
+
 public class Parser {
 
     public final static int ARRAY_OUTBOUND_FIX = 1;
@@ -11,7 +13,10 @@ public class Parser {
     public static int parseParamater(String instruction) {
 
         if (isRegister(instruction)) {
-            return (Character.getNumericValue(instruction.charAt(1)) - ARRAY_OUTBOUND_FIX);
+            if (instruction.length() == 2) {
+                return (getNumericValue(instruction.charAt(1)) - ARRAY_OUTBOUND_FIX);
+            }
+            return 9;
         }
 
         if (isDirectMemoryAcess(instruction)) {

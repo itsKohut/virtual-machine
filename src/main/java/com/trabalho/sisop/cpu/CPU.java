@@ -22,7 +22,7 @@ public class CPU extends Thread {
 
     public static Semaphore cpuSemaphore = new Semaphore(0);
 
-    public final static int QUANTITY_OF_REGISTERS = 9;
+    public final static int QUANTITY_OF_REGISTERS = 10;
     private final static String STOP = "STOP";
     private final static String TRAP = "TRAP";
     public static final int INVALID = -1;
@@ -65,20 +65,23 @@ public class CPU extends Thread {
 
         while (true) {
 
+            cpuSemaphore.acquire();
+
+            log.info("Process with id {} running on CPU", runningPID);
+
             int clock = 0;
             String OPCODE = "";
             InterruptProcessor ip = new InterruptProcessor();
-            Integer logicalMemoryPosition = null;
-
-            cpuSemaphore.acquire();
 
             while (isFalse(OPCODE.equals(STOP))) {
 
-                logicalMemoryPosition = MemoryManager.logicalMemoryTranslator(pidMemoryFrames, PC);
+                Integer logicalMemoryPosition = MemoryManager.logicalMemoryTranslator(pidMemoryFrames, PC);
                 String instruction = MemoryManager.getInstructions(logicalMemoryPosition);
                 String[] parameters = Parser.parseOperation(instruction);
 
                 OPCODE = parameters[0];
+
+                //TODO instrução de TRAP
 
                 if (checkInterruptions(ip, clock, logicalMemoryPosition, OPCODE) == TRUE) {
                     break;
@@ -90,7 +93,7 @@ public class CPU extends Thread {
                 clock++;
             }
 
-            ip.handleInterruption(runningPID, logicalMemoryPosition);
+            ip.handleInterruption(runningPID);
         }
     }
 
@@ -99,8 +102,14 @@ public class CPU extends Thread {
         boolean flag = false;
 
         if (OPCODE.equals(TRAP)) {
-            CPU.incrementPC(); //
-            ip.setFlag(InterruptProcessor.INTERRUPTION_BY_IO);
+            CPU.incrementPC();
+
+            if (MemoryManager.logicalMemoryTranslator(pidMemoryFrames, CPU.getValueFromRegister(9)) == -1) {
+                ip.setFlag(InterruptProcessor.HALT);
+            } else {
+                ip.setFlag(InterruptProcessor.INTERRUPTION_BY_IO);
+
+            }
             flag = true;
         }
 
@@ -121,5 +130,4 @@ public class CPU extends Thread {
 
         return flag;
     }
-
 }

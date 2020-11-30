@@ -3,9 +3,11 @@ package com.trabalho.sisop;
 import com.trabalho.sisop.cpu.CPU;
 import com.trabalho.sisop.order.IOTYpe;
 import com.trabalho.sisop.process.ProcessManager;
+import lombok.extern.slf4j.Slf4j;
 
 import static com.trabalho.sisop.Dispatcher.dispatchSemaphore;
 
+@Slf4j
 public class InterruptProcessor {
 
     public static final int HALT = 0;
@@ -20,21 +22,29 @@ public class InterruptProcessor {
         interruptFlags[type] = true;
     }
 
-    public void handleInterruption(int programID, int logicalMemoryPosition) {
+    public void handleInterruption(int programID) {
 
-        if (interruptFlags[0]) { // Instrução com  erro
+        if (interruptFlags[0]) {
+            log.info("Interruption by invalid instruction");
             ProcessManager.deallocate(programID);
-        } else if (interruptFlags[1]) { // Programa finalizado
+
+        } else if (interruptFlags[1]) {
+            log.info("Interruption by stop instruction");
             ProcessManager.deallocate(programID);
-        } else if (interruptFlags[2]) { // Devido a IO
 
-            // Pega os valores dos registradores
-            int ioType = CPU.getValueFromRegister(8);
-            IOTYpe teste = IOTYpe.getEnum(ioType);
+        } else if (interruptFlags[2]) {
 
-            ProcessManager.IO_1(programID, teste, logicalMemoryPosition);
+            log.info("Interruption by IO");
+            int tipo = CPU.getValueFromRegister(8);
+            int value = CPU.getValueFromRegister(9);
 
-        } else if (interruptFlags[3]) { // Por tempo
+            IOTYpe iotYpe = IOTYpe.getEnum(tipo);
+
+            ProcessManager.resolveIOInterruption(programID, iotYpe, value);
+
+        } else if (interruptFlags[3]) {
+
+            log.info("Interruption by clock timer");
             ProcessManager.saveContext(programID);
         }
 
